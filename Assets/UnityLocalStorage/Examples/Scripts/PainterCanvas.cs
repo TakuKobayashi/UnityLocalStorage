@@ -11,6 +11,7 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
     [SerializeField] Image painterImage;
     [SerializeField] bool showLocalStorageLog = true;
     [SerializeField] string encrypedPassword = "aqdai6*--8~7Tex(R*|pVARVI0OJeOF>";
+    [SerializeField] string saveFileName = "localstorageeample";
 
     const string SaveLocalStorageKey = "drawPointsKey";
 
@@ -27,6 +28,7 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
     {
         LocalStorage.LogEnabled = showLocalStorageLog;
         LocalStorage.EncyptPassword = encrypedPassword;
+        LocalStorage.SaveFileName = saveFileName;
         LocalStorage.Setup();
     }
 

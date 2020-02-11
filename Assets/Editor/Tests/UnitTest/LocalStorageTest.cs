@@ -12,11 +12,13 @@ namespace UnityLocalStorageTest
     public class LocalStorageTest
     {
         private const string UnitTestDebugKey = "unittestdebugkey";
+        private const string UnitTestSaveFileName = "localstorageunittest";
 
         // 全てのテストが始まる時に呼ばれる。
         [SetUp]
         public void SetUp()
         {
+            LocalStorage.SaveFileName = UnitTestSaveFileName;
         }
 
         // 全てのテストが終わった時に呼ばれる。
