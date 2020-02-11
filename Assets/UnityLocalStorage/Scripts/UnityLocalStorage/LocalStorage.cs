@@ -29,7 +29,6 @@ namespace UnityLocalStorage
             }
         }
 
-        //Threadからでも一応使えるようにしておくための対応
         private static string storageFilePathCache = null;
         private static string StorageFilePath
         {
@@ -45,12 +44,12 @@ namespace UnityLocalStorage
         }
 
         /// <summary>
-        /// <para>コンストラクタ</para>
-        /// <para>ローカルストレージに保存されているデータをメモリにのせる</para>
+        /// <para>各種機能がどの状態でも問題なく使えるように事前に準備しておく</para>
         /// </summary>
-        static LocalStorage()
+        public static void Setup()
         {
-            // データへのアクセスを高速にするためにあらかじめロードしておく
+            storageFilePathCache = StorageFilePath;
+            // Preload From Data
             SavedData = Load();
         }
 
