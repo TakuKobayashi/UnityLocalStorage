@@ -43,7 +43,7 @@ namespace NetworkConsole
             EditorGUILayout.LabelField("LocalStorage");
             if (GUILayout.Button("Clear"))
             {
-                UnityLocalStorage.LocalStorage.Clear();
+                UnityLocalStorage.LocalStorage.DeleteAll();
                 Debug.Log("LocalStorage Cleared");
             }
             EditorGUILayout.EndHorizontal();

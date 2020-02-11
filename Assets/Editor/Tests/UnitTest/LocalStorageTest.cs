@@ -23,8 +23,7 @@ namespace UnityLocalStorageTest
         [TearDown]
         public void TearDown()
         {
-            LocalStorage.Clear();
-            LocalStorage.Save();
+            LocalStorage.DeleteAll();
         }
 
         /// <summary>
@@ -474,7 +473,7 @@ namespace UnityLocalStorageTest
             Assert.AreEqual(LocalStorage.HasKey(key1), true);
             Assert.AreEqual(LocalStorage.HasKey(key2), true);
             Assert.AreEqual(LocalStorage.HasKey(key3), true);
-            LocalStorage.Clear();
+            LocalStorage.ClearValues();
             Assert.AreEqual(LocalStorage.HasKey(key1), false);
             Assert.AreEqual(LocalStorage.HasKey(key2), false);
             Assert.AreEqual(LocalStorage.HasKey(key3), false);
@@ -497,7 +496,7 @@ namespace UnityLocalStorageTest
             Assert.AreEqual(LocalStorage.HasKey(key1), true);
             Assert.AreEqual(LocalStorage.HasKey(key2), true);
             Assert.AreEqual(LocalStorage.HasKey(key3), true);
-            LocalStorage.Clear();
+            LocalStorage.ClearValues();
             LocalStorage.Save();
             LocalStorage.Reload();
             Assert.AreEqual(LocalStorage.HasKey(key1), false);
@@ -522,7 +521,7 @@ namespace UnityLocalStorageTest
             Assert.AreEqual(LocalStorage.HasKey(key1), true);
             Assert.AreEqual(LocalStorage.HasKey(key2), true);
             Assert.AreEqual(LocalStorage.HasKey(key3), true);
-            LocalStorage.Clear();
+            LocalStorage.ClearValues();
             Assert.AreEqual(LocalStorage.HasKey(key1), false);
             Assert.AreEqual(LocalStorage.HasKey(key2), false);
             Assert.AreEqual(LocalStorage.HasKey(key3), false);

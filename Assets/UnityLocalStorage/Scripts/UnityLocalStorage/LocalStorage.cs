@@ -244,9 +244,18 @@ namespace UnityLocalStorage
         }
 
         /// <summary>
+        /// <para>すべてのデータを削除する</para>
+        /// </summary>
+        public static void DeleteAll()
+        {
+            ClearValues();
+            Save();
+        }
+
+        /// <summary>
         /// <para>すべてのデータをメモリから削除する</para>
         /// </summary>
-        public static void Clear()
+        public static void ClearValues()
         {
             volatilityData.Clear();
             SavedData.Clear();
