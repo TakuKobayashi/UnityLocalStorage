@@ -9,6 +9,7 @@ using UnityLocalStorage;
 public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] Image painterImage;
+    [SerializeField] Text messageText;
     [SerializeField] bool showLocalStorageLog = true;
     [SerializeField] string encrypedPassword = "aqdai6*--8~7Tex(R*|pVARVI0OJeOF>";
     [SerializeField] string saveFileName = "localstorageeample";
@@ -34,7 +35,19 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 
     void Start()
     {
-        ClearDrawPainter();
+        ReloadFromLocalStorage();
+    }
+
+    private void DrawMessageText()
+    {
+        if(drawPointsList.Count > 0 || currentDrawPoints.Count > 0)
+        {
+            messageText.gameObject.SetActive(false);
+        }
+        else
+        {
+            messageText.gameObject.SetActive(true);
+        }
     }
 
     private void ClearDrawPainter()
@@ -50,10 +63,25 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
         texture.Apply();
     }
 
+    private void DrawCurrentPainter()
+    {
+        foreach (List<Vector3> pathPoints in drawPointsList)
+        {
+            for(int i = 0;i < pathPoints.Count - 1; ++i)
+            {
+                Vector3 point = pathPoints[i];
+                Vector3 nextPoint = pathPoints[i + 1];
+                LineTo(point, nextPoint, lineColor);
+            }
+        }
+        texture.Apply();
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         beforeMousePos = GetPosition(eventData);
         currentDrawPoints.Add(beforeMousePos);
+        DrawMessageText();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -63,6 +91,7 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
         beforeMousePos = v;
         currentDrawPoints.Add(v);
         texture.Apply();
+        DrawMessageText();
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -74,6 +103,7 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
         drawPointsList.Add(currentDrawPoints);
         LocalStorage.SetValue(SaveLocalStorageKey, drawPointsList);
         currentDrawPoints = new List<Vector3>();
+        DrawMessageText();
     }
 
     public Vector3 GetPosition(PointerEventData dat)
@@ -154,7 +184,11 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 
     public void ReloadFromLocalStorage()
     {
+        LocalStorage.Reload();
         drawPointsList = LocalStorage.GetGenericObject<List<List<Vector3>>>(SaveLocalStorageKey, new List<List<Vector3>>());
+        ClearDrawPainter();
+        DrawCurrentPainter();
+        DrawMessageText();
     }
 
     public void SaveLocalStorage()
@@ -166,6 +200,8 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
     {
         drawPointsList.Clear();
         currentDrawPoints.Clear();
+        LocalStorage.SetValue(SaveLocalStorageKey, drawPointsList);
         ClearDrawPainter();
+        DrawMessageText();
     }
 }
