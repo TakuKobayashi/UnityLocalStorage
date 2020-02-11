@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using MessagePack;
 using UnityCipher;
 
 namespace UnityLocalStorage
@@ -277,13 +278,12 @@ namespace UnityLocalStorage
                 willSaveData.Add(keys[i], SavedData[keys[i]]);
             }
 
-            string json = JsonConvert.SerializeObject(willSaveData);
-            byte[] jsonBinary = Encoding.UTF8.GetBytes(json);
+            byte[] binary = MessagePackSerializer.Serialize(willSaveData, MessagePack.Resolvers.ContractlessStandardResolver.Options);
             if (LogEnabled)
             {
-                PublishLog(json);
+                PublishLog(MessagePackSerializer.ConvertToJson(binary));
             }
-            File.WriteAllBytes(StorageFilePath, RijndaelEncryption.Encrypt(jsonBinary, EncyptPassword));
+            File.WriteAllBytes(StorageFilePath, RijndaelEncryption.Encrypt(binary, EncyptPassword));
         }
 
         /// <summary>
@@ -291,23 +291,26 @@ namespace UnityLocalStorage
         /// </summary>
         public static Dictionary<string, object> Load()
         {
-            string json = "";
+			Dictionary<string, object> resultData = new Dictionary<string, object>();
+			byte[] savedBinaryData = null;
             string filePath = StorageFilePath;
             if (File.Exists(filePath))
             {
-                byte[] savedDataJsonBinary = RijndaelEncryption.Decrypt(File.ReadAllBytes(filePath), EncyptPassword);
-                json = Encoding.UTF8.GetString(savedDataJsonBinary);
-            }
-            Dictionary<string, object> parsedJson = new Dictionary<string, object>();
-            if (!string.IsNullOrEmpty(json))
-            {
-                parsedJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                savedBinaryData = RijndaelEncryption.Decrypt(File.ReadAllBytes(filePath), EncyptPassword);
+                resultData = MessagePackSerializer.Deserialize<Dictionary<string, object>>(savedBinaryData);
             }
             if (LogEnabled)
             {
-                PublishLog(json);
+                if(savedBinaryData == null)
+                {
+                    PublishLog("");
+                }
+                else
+                {
+                    PublishLog(MessagePackSerializer.ConvertToJson(savedBinaryData));
+                }
             }
-            return parsedJson;
+            return resultData;
         }
 
         /// <summary>
@@ -315,7 +318,8 @@ namespace UnityLocalStorage
         /// </summary>
         public static void PublishCurrentAllDataLog()
         {
-            PublishLog(JsonConvert.SerializeObject(SavedData));
+            byte[] binary = MessagePackSerializer.Serialize(SavedData);
+            PublishLog(MessagePackSerializer.ConvertToJson(binary));
         }
 
         /// <summary>
@@ -333,7 +337,8 @@ namespace UnityLocalStorage
                 }
                 willSaveData.Add(keys[i], SavedData[keys[i]]);
             }
-            PublishLog(JsonConvert.SerializeObject(willSaveData));
+            byte[] binary = MessagePackSerializer.Serialize(willSaveData);
+            PublishLog(MessagePackSerializer.ConvertToJson(binary));
         }
 
         private static void PublishLog(string json)
