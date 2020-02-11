@@ -9,6 +9,9 @@ using UnityLocalStorage;
 public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField] Image painterImage;
+    [SerializeField] bool showLocalStorageLog = true;
+    [SerializeField] string encrypedPassword = "aqdai6*--8~7Tex(R*|pVARVI0OJeOF>";
+
     const string SaveLocalStorageKey = "drawPointsKey";
 
     Texture2D texture;
@@ -19,6 +22,13 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 
     List<List<Vector3>> drawPointsList = new List<List<Vector3>>();
     List<Vector3> currentDrawPoints = new List<Vector3>();
+
+    void Awake()
+    {
+        LocalStorage.LogEnabled = showLocalStorageLog;
+        LocalStorage.EncyptPassword = encrypedPassword;
+        LocalStorage.Setup();
+    }
 
     void Start()
     {
@@ -61,7 +71,7 @@ public class PainterCanvas : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
         currentDrawPoints.Add(v);
         drawPointsList.Add(currentDrawPoints);
         LocalStorage.SetValue(SaveLocalStorageKey, drawPointsList);
-        currentDrawPoints.Clear();
+        currentDrawPoints = new List<Vector3>();
     }
 
     public Vector3 GetPosition(PointerEventData dat)
