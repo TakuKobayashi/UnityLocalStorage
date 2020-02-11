@@ -10,22 +10,37 @@ namespace UnityLocalStorage
 {
     public class LocalStorage
     {
-        private static bool LogEnabled = false;
-        private static string EncyptPassword = "password";
+        public static bool LogEnabled = false;
+        public static string EncyptPassword = "<4Q0fXVnj07OFF?N_Wske1YbYLdYm.YD";
+        public static string SaveFileName = "unitylocalstorage";
 
         private static HashSet<string> volatilityData = new HashSet<string>();
-        private static Dictionary<string, object> savedData;
-
+        private static Dictionary<string, object> savedDataCache = null;
         private static Dictionary<string, object> SavedData
         {
-            set { savedData = value; }
+            set { savedDataCache = value; }
             get
             {
-                if (savedData == null)
+                if (savedDataCache == null)
                 {
-                    savedData = Load();
+                    savedDataCache = Load();
                 }
-                return savedData;
+                return savedDataCache;
+            }
+        }
+
+        //Threadからでも一応使えるようにしておくための対応
+        private static string storageFilePathCache = null;
+        private static string StorageFilePath
+        {
+            get
+            {
+                if (storageFilePathCache != null)
+                {
+                    return storageFilePathCache;
+                }
+                storageFilePathCache = Path.Combine(UnityEngine.Application.persistentDataPath, SaveFileName);
+                return storageFilePathCache;
             }
         }
 
@@ -71,6 +86,22 @@ namespace UnityLocalStorage
         }
 
         /// <summary>
+        /// <para>現在メモリには乗っているが保存されない設定になっているKeyの配列</para>
+        /// </summary>
+        public static string[] GetCurrentVolatilityKeys()
+        {
+            return volatilityData.ToArray();
+        }
+
+        /// <summary>
+        /// <para>メモリには乗っているが保存されない設定になっているKeyを全て消す</para>
+        /// </summary>
+        public static void ClearVolatilityKeys()
+        {
+            volatilityData.Clear();
+        }
+
+        /// <summary>
         /// <para>key-value形式でメモリにのっているデータに指定したkeyが存在するかどうか判別する</para>
         /// <para>【第1引数】key</para>
         /// </summary>
@@ -90,7 +121,7 @@ namespace UnityLocalStorage
             {
                 if (SavedData[key] is T)
                 {
-                    return (T)SavedData[key];
+                    return (T) SavedData[key];
                 }
                 return JsonConvert.DeserializeObject<T>(GetString(key));
             }
@@ -218,6 +249,7 @@ namespace UnityLocalStorage
         /// </summary>
         public static void Clear()
         {
+            volatilityData.Clear();
             SavedData.Clear();
         }
 
@@ -276,22 +308,6 @@ namespace UnityLocalStorage
             logStr.Append("</color>");
             logStr.Append("\n\n");
             UnityEngine.Debug.Log(logStr.ToString());
-        }
-
-        //Threadからでも一応使えるようにしておくための対応
-        private static string storageFilePath = null;
-
-        private static string StorageFilePath
-        {
-            get
-            {
-                if (storageFilePath != null)
-                {
-                    return storageFilePath;
-                }
-                storageFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "localstorage");
-                return storageFilePath;
-            }
         }
     }
 }
