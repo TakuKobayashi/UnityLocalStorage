@@ -279,7 +279,10 @@ namespace UnityLocalStorage
 
             string json = JsonConvert.SerializeObject(willSaveData);
             byte[] jsonBinary = Encoding.UTF8.GetBytes(json);
-            PublishLog(json);
+            if (LogEnabled)
+            {
+                PublishLog(json);
+            }
             File.WriteAllBytes(StorageFilePath, RijndaelEncryption.Encrypt(jsonBinary, EncyptPassword));
         }
 
@@ -301,13 +304,41 @@ namespace UnityLocalStorage
             {
                 parsedJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             }
-            PublishLog(json);
+            if (LogEnabled)
+            {
+                PublishLog(json);
+            }
             return parsedJson;
+        }
+
+        /// <summary>
+        /// <para>メモリにのっているデータの内容をLogに出力する</para>
+        /// </summary>
+        public static void PublishCurrentAllDataLog()
+        {
+            PublishLog(JsonConvert.SerializeObject(SavedData));
+        }
+
+        /// <summary>
+        /// <para>メモリにのっているファイルに保存されるデータの内容をLogに出力する</para>
+        /// </summary>
+        public static void PublishCurrentWillSaveDataLog()
+        {
+            Dictionary<string, object> willSaveData = new Dictionary<string, object>();
+            List<string> keys = SavedData.Keys.ToList();
+            for (int i = 0; i < keys.Count; ++i)
+            {
+                if (volatilityData.Contains(keys[i]))
+                {
+                    continue;
+                }
+                willSaveData.Add(keys[i], SavedData[keys[i]]);
+            }
+            PublishLog(JsonConvert.SerializeObject(willSaveData));
         }
 
         private static void PublishLog(string json)
         {
-            if (!LogEnabled) return;
             StringBuilder logStr = new StringBuilder();
             logStr.Append("<color=#FFA500>Load LocalStorage Data</color>");
             logStr.Append("\n\n");
