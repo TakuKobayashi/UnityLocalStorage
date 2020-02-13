@@ -291,7 +291,6 @@ namespace UnityLocalStorage
         /// </summary>
         public static Dictionary<string, object> Load()
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
             string json = "";
             string filePath = StorageFilePath;
             if (File.Exists(filePath))
